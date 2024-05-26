@@ -14,8 +14,10 @@ datasource db {
 }
 
 model Post {
-  id      Int     @id @default(autoincrement())
-  title   String
-  content String?
-  upvotes Int
+  id            Int      @id @default(autoincrement())
+  title         String
+  content       String
+  upvotes       Int      @default(0)
+  ownerGoogleId String
+  createdAt     DateTime @default(now())
 }

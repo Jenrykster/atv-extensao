@@ -2,13 +2,16 @@ import prisma from '@/lib/prisma';
 
 export default async function Home() {
   const posts = await prisma.post.findMany({
-    orderBy: {
-      upvotes: 'asc'
-    }
+    orderBy: [
+      {
+        upvotes: 'asc'
+      },
+      { createdAt: 'desc' }
+    ]
   })
 
   return (
-    <section>
+    <section className='flex flex-col gap-4'>
       {posts.length === 0 && <p className='text-center text-2xl text-gray-700'>
         Nenhuma postagem disponível
       </p>}

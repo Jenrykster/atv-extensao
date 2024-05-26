@@ -14,12 +14,17 @@ export default function Header({
 }) {
 
   return <header className={'border-b-2 border-gray-500 border-solid ' + roboto.className}>
-    <div className='max-w-screen-lg mx-auto p-8 flex items-center justify-between'>
-      <Link href='/posts'>
-        <h1 className='font-medium text-2xl'>
-          ProtesteAqui
-        </h1>
-      </Link>
+    <div className='whitespace-nowrap max-w-screen-lg mx-auto p-8 flex items-center justify-between'>
+      <div className='gap-4 flex items-baseline'>
+        <Link href='/posts'>
+          <h1 className='font-medium text-2xl'>
+            ProtesteAqui
+          </h1>
+        </Link>
+        <Link className='underline' href="posts/new">
+          Criar protesto
+        </Link>
+      </div>
 
       <div className='flex gap-8'>
 
