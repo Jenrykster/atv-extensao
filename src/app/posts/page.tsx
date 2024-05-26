@@ -8,28 +8,10 @@ export default async function Home() {
 
   const posts = await prisma.post.findMany({
     orderBy: [
-      {
-        reaction: {
-          _count: 'desc'
-        }
-      },
       { createdAt: 'desc' }
     ],
     include: {
-      _count: {
-        select: {
-          reaction: {
-            where: {
-              upvote: true
-            }
-          }
-        }
-      },
-      reaction: {
-        where: {
-          ownerGoogleId: session?.user?.email!
-        }
-      }
+      reaction: true
     }
 
   })
@@ -65,20 +47,31 @@ export default async function Home() {
     revalidatePath('/posts')
   }
 
+  const sortedPosts = posts.map(post => {
+    const score = post.reaction.reduce((prev, curr) => curr.upvote ? prev + 1 : prev - 1, 0)
+    return {
+      ...post,
+      reaction: post.reaction.find(reaction => reaction.ownerGoogleId === session?.user?.email!),
+      score
+    }
+  }).sort((prev, curr) => {
+    return prev.score > curr.score ? -1 : 1
+  })
+
   return (
     <section className='flex flex-col gap-4'>
       {posts.length === 0 && <p className='text-center text-2xl text-gray-700'>
         Nenhuma postagem disponível
       </p>}
       {
-        posts.map(post =>
+        sortedPosts.map(post =>
           <Post
             session={session}
             key={post.id}
             postData={{
               ...post,
-              reaction: post.reaction[0],
-              upvotes: post._count.reaction
+              reaction: post.reaction!,
+              upvotes: post.score
             }}
             onDelete={deletePost}
             onOpinion={handleOpinion}
