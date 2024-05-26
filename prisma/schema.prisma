@@ -17,7 +17,19 @@ model Post {
   id            Int      @id @default(autoincrement())
   title         String
   content       String
-  upvotes       Int      @default(0)
   ownerGoogleId String
   createdAt     DateTime @default(now())
+
+  reaction Reaction[]
+}
+
+model Reaction {
+  ownerGoogleId String
+  postId        Int
+  upvote        Boolean
+  createdAt     DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, ownerGoogleId])
 }
