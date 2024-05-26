@@ -21,9 +21,11 @@ export default function Header({
             ProtesteAqui
           </h1>
         </Link>
-        <Link className='underline' href="posts/new">
-          Criar protesto
-        </Link>
+        {session &&
+          <Link className='underline' href="posts/new">
+            Criar protesto
+          </Link>
+        }
       </div>
 
       <div className='flex gap-8'>

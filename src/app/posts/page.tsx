@@ -1,6 +1,11 @@
+import Post from '@/components/Post';
+import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 export default async function Home() {
+  const session = await auth()
+
   const posts = await prisma.post.findMany({
     orderBy: [
       {
@@ -10,6 +15,13 @@ export default async function Home() {
     ]
   })
 
+  async function deletePost(id: number) {
+    'use server'
+
+    await prisma.post.delete({ where: { id, ownerGoogleId: session?.user?.email! } })
+    revalidatePath('/posts')
+  }
+
   return (
     <section className='flex flex-col gap-4'>
       {posts.length === 0 && <p className='text-center text-2xl text-gray-700'>
@@ -17,10 +29,15 @@ export default async function Home() {
       </p>}
       {
         posts.map(post =>
-          <div className='rounded-md flex flex-col gap-2 bg-gray-300 border-gray-600 border-solid border-2 p-8' key={post.id}>
-            <h1 className='text-xl font-semibold'>{post.title}</h1>
-            <p>{post.content}</p>
-          </div>)
+          <Post
+            id={post.id}
+            key={post.id}
+            title={post.title}
+            ownsPost={post.ownerGoogleId === session?.user?.email!}
+            content={post.content}
+            onDelete={deletePost}
+          />
+        )
       }
     </section>
   );
